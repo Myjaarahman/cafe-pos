@@ -1,15 +1,24 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
-type Params = { params: { id: string } };
+export async function PATCH(
+  request: NextRequest,
+  context: { params: { id: string } }
+) {
+  const { id } = context.params;
 
-export async function PATCH(_req: Request, { params }: Params) {
-  const { id } = params;
+  if (!id) {
+    return NextResponse.json({ error: 'Missing order ID' }, { status: 400 });
+  }
+
   const { error } = await supabaseAdmin
     .from('orders')
     .update({ status: 'served' })
     .eq('id', id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
   return NextResponse.json({ ok: true });
 }
