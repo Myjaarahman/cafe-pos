@@ -6,7 +6,7 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> } 
 ) {
   try {
-    const { id } = context.params;
+    const { id } = await context.params;
 
     if (!id) {
       return NextResponse.json({ error: 'Missing order ID' }, { status: 400 });
