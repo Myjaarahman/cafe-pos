@@ -40,7 +40,7 @@ export default function Home() {
     for (let n = 1; n <= 30; n++) if (!occupied.has(n)) available.push(n);
     setAutoNumbers(available);
     if (waitingNumber && occupied.has(waitingNumber)) setWaitingNumber('');
-  }, [orders]);
+  }, [orders, waitingNumber]);
 
   // Calculate total
   const total = useMemo(
