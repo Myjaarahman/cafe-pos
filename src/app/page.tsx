@@ -160,7 +160,6 @@ export default function Home() {
                 </div>
                 <ul className="mt-2 text-sm space-y-1">
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-{o.order_items?.map((oi: any) => (
                   {o.order_items?.map((oi: Order['order_items'][number]) => (
                     <li key={oi.id} className="flex justify-between">
                       <span>
