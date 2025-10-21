@@ -19,7 +19,7 @@ export type Order = {
   id: string;
   order_number: number;
   total: number | string;
-  status: 'active' | 'served';
+  status: 'active' | 'served' | 'cancelled';
   created_at: string;
   order_items: {
     id: string;

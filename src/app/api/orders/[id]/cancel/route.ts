@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabaseAdmin';
 
 export async function PATCH(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> } 
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await context.params;
@@ -14,7 +14,7 @@ export async function PATCH(
 
     const { error } = await supabaseAdmin
       .from('orders')
-      .update({ status: 'served' })
+      .update({ status: 'cancelled' })
       .eq('id', id);
 
     if (error) {
@@ -24,8 +24,9 @@ export async function PATCH(
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error(err);
-
-    return NextResponse.json({ error: 'Unexpected server error' }, { status: 500 });
-
+    return NextResponse.json(
+      { error: 'Unexpected server error' },
+      { status: 500 }
+    );
   }
 }

@@ -14,6 +14,8 @@ export default function Home() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [waitingNumber, setWaitingNumber] = useState<number | ''>('');
   const [autoNumbers, setAutoNumbers] = useState<number[]>([]);
+  const [editingOrder, setEditingOrder] = useState<Order | null>(null);
+  const [editItems, setEditItems] = useState<CartItem[]>([]);
 
   // Load menu from Supabase API
   useEffect(() => {
@@ -129,6 +131,51 @@ export default function Home() {
     }
   };
 
+  const cancelOrder = async (id: string) => {
+    const res = await fetch(`/api/orders/${id}/cancel`, { method: 'PATCH' });
+    if (!res.ok) {
+      const d = await res.json();
+      alert(d.error || 'Failed to cancel order');
+    }
+  };
+
+  const editOrder = (id: string) => {
+    const order = orders.find(o => o.id === id);
+    if (!order) return alert('Order not found.');
+
+    // Convert order_items to editable cart items
+    const items = order.order_items.map(oi => ({
+      item_id: oi.item_id,
+      name: oi.menu_items?.name || '',
+      quantity: oi.quantity,
+      unit_price: oi.unit_price,
+    }));
+
+    setEditingOrder(order);
+    setEditItems(items);
+  };
+
+  const saveEditedOrder = async () => {
+    if (!editingOrder) return;
+
+    const payload = { items: editItems };
+
+    const res = await fetch(`/api/orders/${editingOrder.id}/edit`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || 'Failed to update order.');
+      return;
+    }
+
+    alert('Order updated successfully!');
+    setEditingOrder(null);
+  };
+
   // Group menu by category + temperature
   const grouped = useMemo(() => {
     const map: Record<string, MenuItem[]> = {};
@@ -141,8 +188,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-amber-50 text-zinc-900">
-      <header className="p-4 bg-amber-700 text-white text-2xl font-semibold">
-        DaVinci Cafe POS ☕
+      <header className="p-4 bg-amber-700 text-white text-2xl font-semibold flex justify-between">
+        <div>H&S CHOICES ☕</div>
+        <a
+          href="/history"
+          className="text-sm bg-white text-amber-700 px-3 py-1 rounded-lg hover:bg-amber-100"
+        >
+          Past Orders 📜
+        </a>
       </header>
 
       <main className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4">
@@ -174,12 +227,26 @@ export default function Home() {
                   <div className="font-semibold">
                     {formatCurrency(Number(o.total))}
                   </div>
-                  <button
-                    onClick={() => markServed(o.id)}
-                    className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-sm active:scale-95"
-                  >
-                    Served ✅
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => markServed(o.id)}
+                      className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-sm active:scale-95"
+                    >
+                      Served ✅
+                    </button>
+                    <button
+                      onClick={() => cancelOrder(o.id)}
+                      className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm active:scale-95"
+                    >
+                      Cancel ❌
+                    </button>
+                    <button
+                      onClick={() => editOrder(o.id)}
+                      className="px-3 py-1.5 bg-amber-600 text-white rounded-lg text-sm active:scale-95"
+                    >
+                      Edit ✏️
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
@@ -277,7 +344,9 @@ export default function Home() {
                   className="w-20 border rounded-lg px-2 py-1 text-right"
                   value={waitingNumber}
                   onChange={e =>
-                    setWaitingNumber(e.target.value ? Number(e.target.value) : '')
+                    setWaitingNumber(
+                      e.target.value ? Number(e.target.value) : ''
+                    )
                   }
                 />
                 <button
@@ -312,6 +381,82 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      {/* Edit Modal */}
+      {editingOrder && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl w-full max-w-lg">
+            <h2 className="text-xl font-semibold mb-4">
+              Editing Order #{editingOrder.order_number}
+            </h2>
+
+            <div className="space-y-3 max-h-[50vh] overflow-auto">
+              {editItems.map((it, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between border rounded-xl px-3 py-2"
+                >
+                  <div>
+                    <div className="font-medium">{it.name}</div>
+                    <div className="text-xs text-zinc-500">
+                      {formatCurrency(it.unit_price)}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() =>
+                        setEditItems(prev =>
+                          prev.map((p, idx) =>
+                            idx === i
+                              ? {
+                                  ...p,
+                                  quantity: Math.max(1, p.quantity - 1),
+                                }
+                              : p
+                          )
+                        )
+                      }
+                      className="px-2 py-1 border rounded-lg"
+                    >
+                      –
+                    </button>
+                    <div className="w-8 text-center">{it.quantity}</div>
+                    <button
+                      onClick={() =>
+                        setEditItems(prev =>
+                          prev.map((p, idx) =>
+                            idx === i
+                              ? { ...p, quantity: p.quantity + 1 }
+                              : p
+                          )
+                        )
+                      }
+                      className="px-2 py-1 border rounded-lg"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 flex justify-between">
+              <button
+                onClick={() => setEditingOrder(null)}
+                className="px-3 py-2 border rounded-xl"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveEditedOrder}
+                className="px-4 py-2 bg-amber-700 text-white rounded-xl active:scale-95"
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
