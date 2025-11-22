@@ -39,7 +39,7 @@ export default function Home() {
   useEffect(() => {
     const occupied = new Set(orders.map(o => o.order_number));
     const available: number[] = [];
-    for (let n = 1; n <= 30; n++) if (!occupied.has(n)) available.push(n);
+    for (let n = 1; n <= 40; n++) if (!occupied.has(n)) available.push(n);
     setAutoNumbers(available);
     if (waitingNumber && occupied.has(waitingNumber)) setWaitingNumber('');
   }, [orders, waitingNumber]);
