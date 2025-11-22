@@ -39,7 +39,7 @@ export default function Home() {
   useEffect(() => {
     const occupied = new Set(orders.map(o => o.order_number));
     const available: number[] = [];
-    for (let n = 1; n <= 40; n++) if (!occupied.has(n)) available.push(n);
+    for (let n = 1; n <= 50; n++) if (!occupied.has(n)) available.push(n);
     setAutoNumbers(available);
     if (waitingNumber && occupied.has(waitingNumber)) setWaitingNumber('');
   }, [orders, waitingNumber]);
@@ -340,7 +340,7 @@ export default function Home() {
                 <input
                   type="number"
                   min={1}
-                  max={40}
+                  max={50}
                   className="w-20 border rounded-lg px-2 py-1 text-right"
                   value={waitingNumber}
                   onChange={e =>
