@@ -340,7 +340,7 @@ export default function Home() {
                 <input
                   type="number"
                   min={1}
-                  max={30}
+                  max={40}
                   className="w-20 border rounded-lg px-2 py-1 text-right"
                   value={waitingNumber}
                   onChange={e =>
