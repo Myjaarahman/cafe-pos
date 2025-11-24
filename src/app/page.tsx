@@ -258,16 +258,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CENTER: Menu */}
-<section className="md:col-span-6 bg-white rounded-2xl shadow p-3">
-  <h2 className="text-lg font-semibold mb-2">Menu</h2>
-
-  <AccordionMenu
-    groupedMenu={grouped}
-    onAdd={(item) => addToCart(item)}
-  />
-</section>
-
+        
 
         {/* RIGHT: Cart + Total */}
         <section className="md:col-span-3 bg-white rounded-2xl shadow p-3">
