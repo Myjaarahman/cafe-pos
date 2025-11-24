@@ -1,3 +1,5 @@
+import AccordionMenu from "@/components/AccordionMenu";
+
 'use client';
 
 if (process.env.NEXT_PUBLIC_DISABLE_AUTH) {
@@ -257,32 +259,15 @@ export default function Home() {
         </section>
 
         {/* CENTER: Menu */}
-        <section className="md:col-span-6 bg-white rounded-2xl shadow p-3">
-          <h2 className="text-lg font-semibold mb-2">Menu</h2>
-          <div className="space-y-6 max-h-[72vh] overflow-auto pr-1">
-            {Object.entries(grouped).map(([group, items]) => (
-              <div key={group}>
-                <div className="text-sm font-semibold text-amber-800 mb-2">
-                  {group}
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {items.map(item => (
-                    <button
-                      key={item.id}
-                      className="border rounded-xl p-4 text-left active:scale-95"
-                      onClick={() => addToCart(item)}
-                    >
-                      <div className="font-medium">{item.name}</div>
-                      <div className="text-sm text-zinc-600">
-                        {formatCurrency(Number(item.price))}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+<section className="md:col-span-6 bg-white rounded-2xl shadow p-3">
+  <h2 className="text-lg font-semibold mb-2">Menu</h2>
+
+  <AccordionMenu
+    groupedMenu={grouped}
+    onAdd={(item) => addToCart(item)}
+  />
+</section>
+
 
         {/* RIGHT: Cart + Total */}
         <section className="md:col-span-3 bg-white rounded-2xl shadow p-3">
