@@ -1,6 +1,5 @@
-import AccordionMenu from "@/components/AccordionMenu";
-
 'use client';
+import AccordionMenu from "@/components/AccordionMenu";
 
 if (process.env.NEXT_PUBLIC_DISABLE_AUTH) {
   // skip any auth redirect logic
