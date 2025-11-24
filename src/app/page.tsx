@@ -41,7 +41,7 @@ export default function Home() {
   useEffect(() => {
     const occupied = new Set(orders.map(o => o.order_number));
     const available: number[] = [];
-    for (let n = 1; n <= 30; n++) if (!occupied.has(n)) available.push(n);
+    for (let n = 1; n <= 50; n++) if (!occupied.has(n)) available.push(n);
     setAutoNumbers(available);
     if (waitingNumber && occupied.has(waitingNumber)) setWaitingNumber('');
   }, [orders, waitingNumber]);
@@ -258,7 +258,33 @@ export default function Home() {
           </div>
         </section>
 
-        
+        {/* CENTER: Menu */}
+        <section className="md:col-span-6 bg-white rounded-2xl shadow p-3">
+          <h2 className="text-lg font-semibold mb-2">Menu</h2>
+          <div className="space-y-6 max-h-[72vh] overflow-auto pr-1">
+            {Object.entries(grouped).map(([group, items]) => (
+              <div key={group}>
+                <div className="text-sm font-semibold text-amber-800 mb-2">
+                  {group}
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {items.map(item => (
+                    <button
+                      key={item.id}
+                      className="border rounded-xl p-4 text-left active:scale-95"
+                      onClick={() => addToCart(item)}
+                    >
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-sm text-zinc-600">
+                        {formatCurrency(Number(item.price))}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* RIGHT: Cart + Total */}
         <section className="md:col-span-3 bg-white rounded-2xl shadow p-3">
@@ -316,7 +342,7 @@ export default function Home() {
                 <input
                   type="number"
                   min={1}
-                  max={30}
+                  max={50}
                   className="w-20 border rounded-lg px-2 py-1 text-right"
                   value={waitingNumber}
                   onChange={e =>
